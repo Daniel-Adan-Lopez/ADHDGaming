@@ -1,0 +1,95 @@
+
+title:  parallel mediator 1-1-1 model
+data:
+file is "C:\Users\indoo\Desktop\mplus1wider1.dat";
+listwise = off;
+ 
+
+variable:
+NAMES = id sex visit_3 visit_4 visit_5 VGAQ_3 VGAQ_4 VGAQ_5 ADHDDX_3 ADHDDX_4
+     ADHDDX_5 pmqy_3 pmqy_4 pmqy_5 fesy_3 fesy_4 fesy_5 srpfdfs_3 srpfdfs_4
+     srpfdfs_5 srpfii_3 srpfii_4 srpfii_5 srpfses_3 srpfses_4 srpfses_5 age_3 age_4
+     age_5 educ_3 educ_4 educ_5 married_3 married_4 married_5 income_3 income_4
+     income_5 ncrimey_3 ncrimey_4 ncrimey_5 fesp_3 fesp_4 fesp_5;  
+  
+
+missing are .;
+
+usevariables are
+VGAQ_5 ADHDDX_3 
+pmqy_4 fesy_4 srpfdfs_4 fesp_4
+srpfii_4 srpfses_4 age_3 sex married_3 ncrimey_3 income_3 educ_3
+VGAQ_3 pmqy_3 fesy_3 srpfdfs_3 srpfii_3 fesp_3 
+srpfses_3;
+!adjustment for baseline values of covariates
+
+
+count is VGAQ_5(nb);
+ANALYSIS:
+TYPE = GENERAL;
+INTEGRATION=MONTECARLO;
+ESTIMATOR=ML;
+!ESTIMATOR=MLR; 
+bootstrap = 500;
+processors = 10;
+
+ model: 
+ !regression models
+ VGAQ_5 ON ADHDDX_3 pmqy_4 fesy_4 srpfdfs_4 srpfii_4 fesp_4 
+ srpfses_4 age_3 sex married_3 ncrimey_3 income_3 educ_3
+ VGAQ_3 pmqy_3 fesy_3 srpfdfs_3 srpfii_3 fesp_3 
+ srpfses_3;
+ pmqy_4 ON ADHDDX_3 age_3 sex
+ married_3 ncrimey_3 income_3 educ_3;
+ fesy_4 ON ADHDDX_3 age_3 sex
+ married_3 ncrimey_3 income_3 educ_3;
+ srpfdfs_4 ON ADHDDX_3 age_3 sex
+ married_3 ncrimey_3 income_3 educ_3;
+ srpfii_4 ON ADHDDX_3 age_3 sex
+ married_3 ncrimey_3 income_3 educ_3;
+ srpfses_4 ON ADHDDX_3 age_3 sex
+ married_3 ncrimey_3 income_3 educ_3;
+ fesp_4 ON ADHDDX_3 age_3 sex
+ married_3 ncrimey_3 income_3 educ_3;
+ 
+ !specifying residual correlations
+ pmqy_4 WITH fesy_4;
+ pmqy_4 WITH srpfdfs_4;
+ pmqy_4 WITH srpfii_4;
+ pmqy_4 WITH srpfses_4;
+ fesy_4 WITH srpfdfs_4;
+ fesy_4 WITH srpfii_4;
+ fesy_4 WITH srpfses_4;
+ srpfii_4 WITH srpfdfs_4;
+ srpfii_4 WITH srpfses_4;
+ srpfii_4 WITH srpfdfs_4;
+ fesp_4 WITH pmqy_4; 
+ fesp_4 WITH fesy_4; 
+ fesp_4 WITH srpfii_4; 
+ fesp_4 WITH srpfdfs_4;
+ fesp_4 WITH srpfses_4;
+ VGAQ_3 WITH pmqy_3;
+ VGAQ_3 WITH fesy_3;
+ VGAQ_3 WITH srpfii_3;
+ VGAQ_3 WITH srpfdfs_3;
+ VGAQ_3 WITH srpfses_3;
+ VGAQ_3 WITH fesp_3;
+
+
+ model indirect:
+ VGAQ_5 ind ADHDDX_3;
+ VGAQ_5 ind fesy_4;
+ VGAQ_5 ind pmqy_4;
+ VGAQ_5 ind srpfdfs_4;
+ VGAQ_5 ind srpfii_4;
+ VGAQ_5 ind srpfses_4;
+ VGAQ_5 ind fesp_4;
+
+ output:
+ stdyx;
+ CINTERVAL;
+ !CINTERVAL (BOOTSTRAP);
+ sampstat;
+
+ PLOT:
+ TYPE = PLOT3;
